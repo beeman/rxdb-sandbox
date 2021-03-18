@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core'
-import { RxCollection, RxDatabase, RxDocument, RxJsonSchema } from 'rxdb'
+import { RxChangeEvent, RxCollection, RxDatabase, RxDocument, RxJsonSchema } from 'rxdb'
 
 // @ts-ignore
 import pouchdbAdapterIdb from 'pouchdb-adapter-idb'
 import { addRxPlugin, createRxDatabase } from 'rxdb'
 import { BehaviorSubject, from, Observable, of } from 'rxjs'
-import { filter, switchMap } from 'rxjs/operators'
+import { filter, map, switchMap } from 'rxjs/operators'
 
 // Set up the adapter
 addRxPlugin(pouchdbAdapterIdb)
@@ -111,6 +111,13 @@ export class RxdbService {
     return this.loaded$.pipe(
       filter((loaded) => loaded),
       switchMap(() => this.walletDatabase.wallets.find().sort({ name: 'asc' }).exec()),
+    )
+  }
+
+  walletChanges$(): Observable<RxChangeEvent> {
+    return this.loaded$.pipe(
+      filter((loaded) => loaded),
+      switchMap(() => this.walletDatabase?.wallets?.$),
     )
   }
 
