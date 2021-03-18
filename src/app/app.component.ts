@@ -1,10 +1,26 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
+import { RxdbService } from './rxdb.service'
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  template: `
+    <div>
+      <ng-container *ngIf="walletsCount$ | async as count">
+        <h1>Total wallets: {{ count }}</h1>
+      </ng-container>
+      <button (click)="createWallet()">Create Wallet</button>
+      <ng-container *ngIf="wallets$ | async as wallets">
+        <pre>{{ wallets | json }}</pre>
+      </ng-container>
+    </div>
+  `,
 })
 export class AppComponent {
-  title = 'rxdb-sandbox';
+  readonly wallets$ = this.rxdb.wallets()
+  readonly walletsCount$ = this.rxdb.walletsCount()
+  constructor(private readonly rxdb: RxdbService) {}
+
+  createWallet(): void {
+    this.rxdb.createWallet().subscribe()
+  }
 }
